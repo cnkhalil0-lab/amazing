@@ -1,0 +1,15 @@
+# A-Maze-ing Configuration File
+
+# Maze dimensions (number of cells)
+WIDTH=20
+HEIGHT=15
+
+# Entry and Exit coordinates (x,y format)
+ENTRY=0,0
+EXIT=19,14
+
+# The destination file for the hexadecimal output
+OUTPUT_FILE=maze.txt
+
+# Boolean flag to ensure the maze has exactly one solution path
+PERFECT=True

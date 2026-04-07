@@ -1,4 +1,3 @@
-
 from typing import Tuple, List
 import random
 
@@ -7,9 +6,17 @@ class MazeGenerator:
     """
     Classe responsable de la génération du labyrinthe pour le projet A-Maze-ing.
     """
+
     # Le constructeur __init__ reçoit les données du partenaire
 
-    def __init__(self, width: int, height: int, entry: Tuple[int, int], exit_pos: Tuple[int, int], perfect: bool):
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        entry: Tuple[int, int],
+        exit_pos: Tuple[int, int],
+        perfect: bool,
+    ):
         # 1. On stocke les informations de configuration
         self.width = width
         self.height = height
@@ -41,16 +48,10 @@ class MazeGenerator:
     def logo_42(self):
         if self.width < 9 or self.height < 7:
             print("Erreur : labyrinthe trop petit pour le 42.")
-            return # On quitte la fonction, on ne dessine rien
+            return  # On quitte la fonction, on ne dessine rien
 
         # 2. Le Calque du 42
-        motif_42 = [
-            "1010111",
-            "1010001",
-            "1110111",
-            "0010100",
-            "0010111"
-        ]
+        motif_42 = ["1010111", "1010001", "1110111", "0010100", "0010111"]
 
         # 3. Calcul du point de départ pour centrer
         start_x = (self.width - 7) // 2
@@ -68,17 +69,37 @@ class MazeGenerator:
         # On utilise l'entrée que ton partenaire t'a donnée (ex: x=0, y=0)
         start_x, start_y = self.entry
         self.visited[start_y][start_x] = True
-        
+
         # Notre "fil rouge" : on ajoute la case de départ dans l'historique
         stack = [(start_x, start_y)]
 
         # Petite astuce de pro pour les directions : (décalage_x, décalage_y, mur_actuel, mur_voisin)
         # Nord=1, Sud=4, Est=2, Ouest=8
         directions = [
-            (0, -1, 1, 4),  # Aller au Nord (y-1) : je casse mon mur Nord(1), le voisin casse son mur Sud(4)
-            (0, 1, 4, 1),   # Aller au Sud (y+1) : je casse mon mur Sud(4), le voisin casse son mur Nord(1)
-            (1, 0, 2, 8),   # Aller à l'Est (x+1) : je casse mon mur Est(2), le voisin casse son mur Ouest(8)
-            (-1, 0, 8, 2)   # Aller à l'Ouest (x-1) : je casse mon mur Ouest(8), le voisin casse son mur Est(2)
+            (
+                0,
+                -1,
+                1,
+                4,
+            ),  # Aller au Nord (y-1) : je casse mon mur Nord(1), le voisin casse son mur Sud(4)
+            (
+                0,
+                1,
+                4,
+                1,
+            ),  # Aller au Sud (y+1) : je casse mon mur Sud(4), le voisin casse son mur Nord(1)
+            (
+                1,
+                0,
+                2,
+                8,
+            ),  # Aller à l'Est (x+1) : je casse mon mur Est(2), le voisin casse son mur Ouest(8)
+            (
+                -1,
+                0,
+                8,
+                2,
+            ),  # Aller à l'Ouest (x-1) : je casse mon mur Ouest(8), le voisin casse son mur Est(2)
         ]
 
         # ÉTAPE 2 : La Boucle Principale
@@ -121,12 +142,11 @@ class MazeGenerator:
                 # Aucun voisin valide ? On recule en supprimant notre case actuelle
                 stack.pop()
 
-
     def open_door(self, pos: Tuple[int, int]):
         x, y = pos
 
         # On vérifie sur quel bord on se trouve.
-        # Les elif (sinon si) garantissent qu'on ne casse qu'un seul mur, 
+        # Les elif (sinon si) garantissent qu'on ne casse qu'un seul mur,
         # même si on est dans un coin.
 
         if x == 0:
@@ -147,7 +167,7 @@ class MazeGenerator:
 
         # S'il n'est sur aucun bord (il est au milieu),
         # on ne fait rien ! Il est déjà connecté.
-    
+
     def make_imperfect(self):
         # 1. Si on a demandé un labyrinthe parfait, on s'arrête tout de suite !
         if self.perfect == True:
@@ -178,18 +198,19 @@ class MazeGenerator:
                 # Le mur est bien là, on le détruit !
                 self.grid[y][x] -= mur_ici
                 self.grid[ny][nx] -= mur_voisin
+
     def solve(self) -> str:
         # ==========================================
         # PHASE 1 & 2 : L'INONDATION ET LES POST-IT
         # ==========================================
-        
+
         # 1. La file d'attente de l'eau (on commence sur l'entrée)
         queue = [self.entry]
-        
+
         # 2. Le dictionnaire de Post-it (Clé: Enfant -> Valeur: Parent)
         # L'entrée n'a pas de parent, donc on met None.
         parent_dict = {self.entry: None}
-        
+
         # 3. Un tableau pour se souvenir d'où l'eau est déjà passée
         visited_bfs = []
         for y in range(self.height):
@@ -197,7 +218,7 @@ class MazeGenerator:
             for x in range(self.width):
                 ligne_visited.append(False)
             visited_bfs.append(ligne_visited)
-            
+
         # On inonde la case de départ
         start_x, start_y = self.entry
         visited_bfs[start_y][start_x] = True
@@ -205,9 +226,9 @@ class MazeGenerator:
         # Les 4 directions (dx, dy, mur_qui_bloque)
         directions = [
             (0, -1, 1),  # Nord
-            (0, 1, 4),   # Sud
-            (1, 0, 2),   # Est
-            (-1, 0, 8)   # Ouest
+            (0, 1, 4),  # Sud
+            (1, 0, 2),  # Est
+            (-1, 0, 8),  # Ouest
         ]
 
         trouve = False
@@ -215,12 +236,12 @@ class MazeGenerator:
         # La boucle d'inondation (tant qu'il y a de l'eau qui avance)
         while len(queue) > 0:
             # On prend la première goutte d'eau de la file (pop(0) lit le début de la liste)
-            current_x, current_y = queue.pop(0) 
+            current_x, current_y = queue.pop(0)
 
             # Est-ce qu'on a touché la sortie ?
             if (current_x, current_y) == self.exit_pos:
                 trouve = True
-                break # On coupe le robinet !
+                break  # On coupe le robinet !
 
             # Sinon, l'eau essaie d'aller dans les 4 directions
             for dx, dy, mur in directions:
@@ -229,23 +250,23 @@ class MazeGenerator:
 
                 # Vérif 1 : On reste dans la carte ?
                 if 0 <= nx < self.width and 0 <= ny < self.height:
-                    
+
                     # Vérif 2 : Est-ce que le mur a bien été CASSÉ ?
                     # Attention : ici on veut que le résultat soit 0 (mur absent) pour passer !
                     if (self.grid[current_y][current_x] & mur) == 0:
-                        
+
                         # Vérif 3 : Est-ce une nouvelle case non inondée ?
                         if visited_bfs[ny][nx] == False:
-                            
+
                             # On inonde la nouvelle case
                             visited_bfs[ny][nx] = True
                             queue.append((nx, ny))
-                            
+
                             # ON COLLE LE POST-IT ! (On note d'où on vient)
                             parent_dict[(nx, ny)] = (current_x, current_y)
 
         if not trouve:
-            return "" # Sécurité si le labyrinthe est impossible
+            return ""  # Sécurité si le labyrinthe est impossible
 
         chemin_inverse = ""
         actuelle = self.exit_pos
@@ -254,20 +275,20 @@ class MazeGenerator:
         while actuelle != self.entry:
             # On lit le dictionnaire pour trouver le parent
             parent = parent_dict[actuelle]
-            
+
             px, py = parent
             ax, ay = actuelle
-            
+
             # On déduit la lettre en comparant les coordonnées
-            if ay < py: 
-                chemin_inverse += "N" # On est monté
-            elif ay > py: 
-                chemin_inverse += "S" # On est descendu
-            elif ax > px: 
-                chemin_inverse += "E" # On est allé à droite
-            elif ax < px: 
-                chemin_inverse += "W" # On est allé à gauche
-            
+            if ay < py:
+                chemin_inverse += "N"  # On est monté
+            elif ay > py:
+                chemin_inverse += "S"  # On est descendu
+            elif ax > px:
+                chemin_inverse += "E"  # On est allé à droite
+            elif ax < px:
+                chemin_inverse += "W"  # On est allé à gauche
+
             # On recule physiquement sur la case parente
             actuelle = parent
 
@@ -283,8 +304,8 @@ if __name__ == "__main__":
     # 1. On définit les règles du jeu
     largeur = 10
     hauteur = 10
-    entree = (0, 0)         # Coin en haut à gauche
-    sortie = (9, 9)         # Coin en bas à droite
+    entree = (0, 0)  # Coin en haut à gauche
+    sortie = (9, 9)  # Coin en bas à droite
     labyrinthe_parfait = False  # On veut des boucles !
 
     # 2. On construit le labyrinthe (l'__init__ fait tout le travail)
@@ -298,4 +319,3 @@ if __name__ == "__main__":
     print(f"Taille : {largeur}x{hauteur}")
     print(f"La solution trouvée est : {chemin_solution}")
     print(f"Nombre de pas pour sortir : {len(chemin_solution)}")
-
