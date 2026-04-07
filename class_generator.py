@@ -16,6 +16,7 @@ class MazeGenerator:
         entry: Tuple[int, int],
         exit_pos: Tuple[int, int],
         perfect: bool,
+        seed: int | None = None
     ):
         # 1. On stocke les informations de configuration
         self.width = width
@@ -23,6 +24,10 @@ class MazeGenerator:
         self.entry = entry
         self.exit_pos = exit_pos
         self.perfect = perfect
+        if seed:
+            if seed < 0:
+                raise ValueError("No negative seed")
+        self.seed = seed
 
         # 2. On prépare notre terrain en mémoire
         self.grid: List[List[int]] = []
@@ -105,6 +110,8 @@ class MazeGenerator:
         # ÉTAPE 2 : La Boucle Principale
         while len(stack) > 0:
             # On regarde où on est (la dernière case de la liste)
+            if self.seed:
+                random.seed(self.seed)
             current_x, current_y = stack[-1]
 
             # On cherche les voisins valides
@@ -117,7 +124,7 @@ class MazeGenerator:
                 # Vérification 1 : Est-ce que le voisin est dans la carte ?
                 if 0 <= nx < self.width and 0 <= ny < self.height:
                     # Vérification 2 : Est-ce qu'il n'est PAS visité (et pas le 42) ?
-                    if self.visited[ny][nx] == False:
+                    if self.visited[ny][nx] is False:
                         # On garde ce voisin en mémoire avec les murs à casser
                         voisins_valides.append((nx, ny, mur_ici, mur_voisin))
 
@@ -169,31 +176,31 @@ class MazeGenerator:
         # on ne fait rien ! Il est déjà connecté.
 
     def make_imperfect(self):
-            if self.perfect == True:
-                return
+        if self.perfect is True:
+            return
 
-            nb_murs_a_casser = (self.width * self.height) // 20
-            
-            # On fait une boucle while pour être sûr de casser le bon nombre de murs
-            murs_casses = 0
-            while murs_casses < nb_murs_a_casser:
-                x = random.randint(1, self.width - 2)
-                y = random.randint(1, self.height - 2)
+        nb_murs_a_casser = (self.width * self.height) // 20
+        
+        # On fait une boucle while pour être sûr de casser le bon nombre de murs
+        murs_casses = 0
+        while murs_casses < nb_murs_a_casser:
+            x = random.randint(1, self.width - 2)
+            y = random.randint(1, self.height - 2)
 
-                directions = [(1, 0, 2, 8), (0, 1, 4, 1)]
-                dx, dy, mur_ici, mur_voisin = random.choice(directions)
+            directions = [(1, 0, 2, 8), (0, 1, 4, 1)]
+            dx, dy, mur_ici, mur_voisin = random.choice(directions)
 
-                nx = x + dx
-                ny = y + dy
+            nx = x + dx
+            ny = y + dy
 
-                # SÉCURITÉ 42 : On refuse de toucher à une case qui vaut 15 !
-                if self.grid[y][x] == 15 or self.grid[ny][nx] == 15:
-                    continue # On passe notre tour et on choisit une autre case
+            # SÉCURITÉ 42 : On refuse de toucher à une case qui vaut 15 !
+            if self.grid[y][x] == 15 or self.grid[ny][nx] == 15:
+                continue  # On passe notre tour et on choisit une autre case
 
-                if (self.grid[y][x] & mur_ici) != 0:
-                    self.grid[y][x] -= mur_ici
-                    self.grid[ny][nx] -= mur_voisin
-                    murs_casses += 1 # On valide qu'un mur a été cassé
+            if (self.grid[y][x] & mur_ici) != 0:
+                self.grid[y][x] -= mur_ici
+                self.grid[ny][nx] -= mur_voisin
+                murs_casses += 1 # On valide qu'un mur a été cassé
 
     def solve(self) -> str:
         # ==========================================

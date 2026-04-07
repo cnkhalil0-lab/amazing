@@ -3,6 +3,7 @@
 install:
 	pip install --upgrade pip
 	pip install flake8 mypy
+	pip install setuptools
 
 run:
 	python3 a_maze_ing.py config.txt
@@ -16,5 +17,5 @@ clean:
 	rm -f maze.txt
 
 lint:
-	python3 -m flake8
-	python3 -m mypy --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs .
+	python3 -m flake8 .
+	python3 -m mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs

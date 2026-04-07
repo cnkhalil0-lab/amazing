@@ -37,7 +37,8 @@ def main() -> None:
 
         # 4. Launch the visualizer
         visualizer = MazeVisualizer(
-            maze_grid=generator.grid, shortest_path=shortest_path, config=config
+            maze_grid=generator.grid, shortest_path=shortest_path,
+            config=config
         )
         visualizer.interaction_loop()
 
@@ -51,3 +52,5 @@ if __name__ == "__main__":
         main()
     except Exception:
         print("unexcepected error!!!!")
+    except BaseException:
+        print("\nExit")
