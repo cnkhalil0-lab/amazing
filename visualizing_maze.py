@@ -1,5 +1,5 @@
 from typing import List, Tuple, Set
-from class_generator import MazeGenerator
+from class_generator.class_generator import MazeGenerator
 from file_IO_sanitization import NecessaryVariables
 
 COLORS = {

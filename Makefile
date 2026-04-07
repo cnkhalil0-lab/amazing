@@ -4,6 +4,7 @@ install:
 	pip install --upgrade pip
 	pip install flake8 mypy
 	pip install setuptools
+	pip install build
 
 run:
 	python3 a_maze_ing.py config.txt

@@ -1,6 +1,6 @@
 import sys
 from file_IO_sanitization import read_file
-from class_generator import MazeGenerator
+from class_generator.class_generator import MazeGenerator
 from hexadicimal_encoder import encode_and_export_maze
 from visualizing_maze import MazeVisualizer
 
