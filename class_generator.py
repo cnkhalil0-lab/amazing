@@ -169,35 +169,31 @@ class MazeGenerator:
         # on ne fait rien ! Il est déjà connecté.
 
     def make_imperfect(self):
-        # 1. Si on a demandé un labyrinthe parfait, on s'arrête tout de suite !
-        if self.perfect == True:
-            return
+            if self.perfect == True:
+                return
 
-        # 2. On calcule combien de murs on va casser au hasard.
-        # Par exemple : on prend la surface totale et on divise par 20 (environ 5% des murs)
-        nb_murs_a_casser = (self.width * self.height) // 20
+            nb_murs_a_casser = (self.width * self.height) // 20
+            
+            # On fait une boucle while pour être sûr de casser le bon nombre de murs
+            murs_casses = 0
+            while murs_casses < nb_murs_a_casser:
+                x = random.randint(1, self.width - 2)
+                y = random.randint(1, self.height - 2)
 
-        for _ in range(nb_murs_a_casser):
-            # On choisit une case complètement au hasard.
-            # (On utilise 1 et width-2 pour éviter de toucher aux murs du périmètre extérieur)
-            x = random.randint(1, self.width - 2)
-            y = random.randint(1, self.height - 2)
+                directions = [(1, 0, 2, 8), (0, 1, 4, 1)]
+                dx, dy, mur_ici, mur_voisin = random.choice(directions)
 
-            # On choisit de casser soit le mur Est, soit le mur Sud (ça suffit pour faire des boucles)
-            # Est : x+1, je casse 2, voisin casse 8
-            # Sud : y+1, je casse 4, voisin casse 1
-            directions = [(1, 0, 2, 8), (0, 1, 4, 1)]
-            dx, dy, mur_ici, mur_voisin = random.choice(directions)
+                nx = x + dx
+                ny = y + dy
 
-            nx = x + dx
-            ny = y + dy
+                # SÉCURITÉ 42 : On refuse de toucher à une case qui vaut 15 !
+                if self.grid[y][x] == 15 or self.grid[ny][nx] == 15:
+                    continue # On passe notre tour et on choisit une autre case
 
-            # 3. LA SÉCURITÉ : Est-ce que le mur est toujours là ?
-            # On utilise le "&" (ET binaire). Si le résultat n'est pas 0, le mur existe.
-            if (self.grid[y][x] & mur_ici) != 0:
-                # Le mur est bien là, on le détruit !
-                self.grid[y][x] -= mur_ici
-                self.grid[ny][nx] -= mur_voisin
+                if (self.grid[y][x] & mur_ici) != 0:
+                    self.grid[y][x] -= mur_ici
+                    self.grid[ny][nx] -= mur_voisin
+                    murs_casses += 1 # On valide qu'un mur a été cassé
 
     def solve(self) -> str:
         # ==========================================
